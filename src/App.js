@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom/client'
-import axios from 'axios'
-import _ from "lodash"
 import {
   useQuery,
-  useQueryClient,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import './App.css';
+import {Grid, Button, Box, Typography, Input, FormControl} from '@mui/material';
+
 const queryClient = new QueryClient()
 
 async function useFetchFunc(query) {
@@ -29,16 +27,15 @@ async function useFetchFunc(query) {
 
 
 function QueryOutput({ query }) {
-  const queryClient = useQueryClient()
-  const { status, data, error, isFetching, isLoading} = useQuery({queryKey: [query], queryFn: useFetchFunc})
+  const { data, isLoading} = useQuery({queryKey: [query], queryFn: useFetchFunc})
   return (
-    <div>
-      Status: {isLoading ? "Sending Query..." : "Sent"}
+    <Grid>
+      <Typography>Status: {isLoading ? "Sending Query..." : "Sent"}</Typography>
       <br/>
-      Last input: {JSON.stringify(query)}
+      <Typography>Last input: {JSON.stringify(query)}</Typography>
       <br/>
-      JSON Response: {JSON.stringify(data)}
-    </div>
+      <Typography>JSON Response: {JSON.stringify(data)}</Typography>
+    </Grid>
   )
 }
 
@@ -46,8 +43,6 @@ function QueryOutput({ query }) {
 function App() {
   const [query, setQuery] = useState('');
   const [userInput, setUserInput] = useState('');
-
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -57,22 +52,28 @@ function App() {
   
 
   return (
-    <div>
+    <div className='App'>
+    <Box>
     <QueryClientProvider client={queryClient}>
-    <h1>SWA Tengu Test</h1>
+      
+    <Typography variant='h2'> SWA Tengu Test V1</Typography>
     <form onSubmit={handleSubmit}>
-      <input
+    <FormControl>
+      <Input
         type="text"
         value={userInput}
+        placeholder='Enter your query here...'
         onChange={(e) => setUserInput(e.target.value)}
       />
-      <button type="submit">Submit</button>
+
+      <Button  variant="contained" type="submit">Submit</Button>
+    </FormControl>
     </form>
     <QueryOutput query={query} />
-  <ReactQueryDevtools initialIsOpen />
+   <ReactQueryDevtools initialIsOpen />
   </QueryClientProvider>
+  </Box>
   </div>
-
   );
 }
 
