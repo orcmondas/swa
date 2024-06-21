@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-// import ReactDOM from 'react-dom/client'
-// import axios from 'axios'
-// import _ from "lodash"
 import {
   useQuery,
-  // useQueryClient,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
@@ -29,7 +25,6 @@ async function useFetchFunc(query) {
 
 
 function QueryOutput({ query }) {
-  // const queryClient = useQueryClient()
   const { data, isLoading} = useQuery({queryKey: [query], queryFn: useFetchFunc})
   return (
     <div>
