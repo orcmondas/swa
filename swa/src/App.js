@@ -13,19 +13,15 @@ import './App.css';
 const queryClient = new QueryClient()
 
 async function useFetchFunc(query) {
-  const body = [{
-    key: "query", value: query
-  }]
-  const formBody = _.map(body, ({ key, value }) => {
-    return encodeURIComponent(key) + "=" + encodeURIComponent(value)
-  }).join("&")
-
-  const response = await fetch('api/sparql', {
+  const response = await fetch('https://reqres.in/api/users/', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json',
     },
-    body: formBody
+    body: {
+      "name": query,
+      "job": "leader"
+  }
   })
   return response
 }
@@ -34,12 +30,14 @@ async function useFetchFunc(query) {
 
 function QueryOutput({ query }) {
   const queryClient = useQueryClient()
-  const { status, data, error, isFetching, isLoading} = useQuery({queryKey: query, queryFn: useFetchFunc})
+  const { status, data, error, isFetching, isLoading} = useQuery({queryKey: [query], queryFn: useFetchFunc})
   return (
     <div>
       Status: {isLoading ? "Sending Query..." : "Sent"}
       <br/>
       Last input: {JSON.stringify(query)}
+      <br/>
+      JSON Response: {JSON.stringify(data)}
     </div>
   )
 }
@@ -50,8 +48,7 @@ function App() {
   const [userInput, setUserInput] = useState('');
 
 
-  // const data = {}
-  // const isLoading = false;
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setQuery(userInput);
@@ -59,22 +56,10 @@ function App() {
 
   
 
-  // const { data, error, isLoading } = useQuery({queryKey: 'sparql'}, async () => {
-  //   if (message) {
-  //     const response = await fetch(`/api/sparql/${message}`);
-  //     if (!response.ok) {
-  //       throw new Error('Network response was not ok');
-  //     }
-  //     return response.json();
-  //   }
-  // }, {
-  //   enabled: !!message,
-  // });
-
   return (
     <div>
     <QueryClientProvider client={queryClient}>
-    <h1>SWA Test</h1>
+    <h1>SWA Tengu Test</h1>
     <form onSubmit={handleSubmit}>
       <input
         type="text"
