@@ -1,0 +1,11 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "routes": [
+    {
+      "route": "/sparql/*",
+      "rewrite": "/api/sparql/{*}",
+      "statusCode": 200,
+      "methods": ["GET", "POST", "OPTIONS"]
+    }
+  ]
+}

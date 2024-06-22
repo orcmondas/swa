@@ -1,44 +1,43 @@
 import React, { useState } from 'react';
-import {
-  useQuery,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './App.css';
-import {Grid, Button, Box, Typography, Input, FormControl} from '@mui/material';
+import { Grid, Button, Box, Typography, Input, FormControl, Stack } from '@mui/material';
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
-async function useFetchFunc(query) {
-  const response = await fetch('https://reqres.in/api/users/', {
+async function fetchSparqlQuery(query) {
+  console.log("Starting request")
+  const response = await fetch(`/sparql/${query}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: {
-      "name": query,
-      "job": "leader"
-  }
-  })
-  return response
+    body: JSON.stringify({
+      name: query,
+      job: 'query-tester',
+    }),
+  });
+  const data = await response.json();
+  console.log("Request completed: ", data)
+  return data;
 }
 
-
+function useSparqlQuery(query) {
+  return useQuery({
+    queryKey: [query, "sparql-test-tengu"],
+    queryFn: () => fetchSparqlQuery(query),
+    enabled: !!query,
+  });
+}
 
 function QueryOutput({ query }) {
-  const { data, isLoading} = useQuery({queryKey: [query], queryFn: useFetchFunc})
-  return (
-    <Grid>
-      <Typography>Status: {isLoading ? "Sending Query..." : "Sent"}</Typography>
-      <br/>
-      <Typography>Last input: {JSON.stringify(query)}</Typography>
-      <br/>
-      <Typography>JSON Response: {JSON.stringify(data)}</Typography>
-    </Grid>
-  )
-}
+  const { data, isLoading, error } = useSparqlQuery(query);
+  if (isLoading) return <Typography>Sending Query...</Typography>;
+  if (error) return <Typography>Error: {error.message}</Typography>;
 
+  return JSON.stringify(data);
+}
 
 function App() {
   const [query, setQuery] = useState('');
@@ -49,31 +48,35 @@ function App() {
     setQuery(userInput);
   };
 
-  
-
   return (
-    <div className='App'>
-    <Box>
-    <QueryClientProvider client={queryClient}>
-      
-    <Typography variant='h2'> SWA Tengu Test V1</Typography>
-    <form onSubmit={handleSubmit}>
-    <FormControl>
-      <Input
-        type="text"
-        value={userInput}
-        placeholder='Enter your query here...'
-        onChange={(e) => setUserInput(e.target.value)}
-      />
+    <div className="App">
+      <Grid>
+        <QueryClientProvider client={queryClient}>
+          <Typography variant="h2"> SWA Tengu Test V1</Typography>
+          <form onSubmit={handleSubmit}>
+            <FormControl>
+              <Input
+                type="text"
+                value={userInput}
+                placeholder="Enter your alias here..."
+                onChange={(e) => setUserInput(e.target.value)}
+              />
 
-      <Button  variant="contained" type="submit">Submit</Button>
-    </FormControl>
-    </form>
-    <QueryOutput query={query} />
-   <ReactQueryDevtools initialIsOpen />
-  </QueryClientProvider>
-  </Box>
-  </div>
+              <Button variant="contained" type="submit">
+                Submit
+              </Button>
+            </FormControl>
+          </form> 
+          <Grid>
+            <Typography>Last input: {JSON.stringify(query)}</Typography>
+            <br />
+            <Typography>JSON Response: {query ? <QueryOutput query={query} /> : <></>}</Typography>
+          </Grid>
+  
+          <ReactQueryDevtools initialIsOpen />
+        </QueryClientProvider>
+      </Grid>
+    </div>
   );
 }
 
