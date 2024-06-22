@@ -4,7 +4,6 @@
     {
       "route": "/sparql/*",
       "rewrite": "/api/sparql/{*}",
-      "statusCode": 200,
       "methods": ["GET", "POST", "OPTIONS"]
     }
   ]
