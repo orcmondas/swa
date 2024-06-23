@@ -5,6 +5,16 @@
       "route": "/sparql/*",
       "rewrite": "/api/sparql/{*}",
       "methods": ["GET", "POST", "OPTIONS"]
+    },
+    {
+      "route": "/*",
+      "allowedRoles": ["authenticated"]
     }
-  ]
+  ],
+  "responseOverrides": {
+    "401": {
+      "statusCode": 302,
+      "redirect": "/.auth/login/aad"
+    }
+  }
 }
